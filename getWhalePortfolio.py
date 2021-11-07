@@ -37,28 +37,35 @@ def getData(holding_ticker):
 
     # Data formatting
 
-    # "History" & "Unnamed: 7" columns are not useful.
-    df = df.drop(columns=['History', 'Unnamed: 7'])
+    # "History", "52WeekLow", "52WeekHigh" & "Unnamed: 7" columns are not useful.
+    df = df.drop(columns=['History', 'Unnamed: 7', "52WeekLow", "52WeekHigh"])
 
-    # "% ofPortfolio" is not a good name for a column.
-    df = df.rename(columns={"% ofPortfolio": "Percentage of Portfolio"})
+    # Column name corrections.
+    df = df.rename(columns={"% ofPortfolio": "Portfolio (%)"})
+    df = df.rename(columns={"+/-ReportedPrice": "Reported Price Change (%)"})
+    df = df.rename(columns={"ReportedPrice*": "Reported Price"})
+    df = df.rename(columns={"RecentActivity": "Recent Activity"})
 
-    # Dollar sign isn't required in "Value" column, it must be a number.
-    df["Value"] = df["Value"].apply(parseValueColumnToNumber)
-    # We convert the column type to numerical
-    df["Value"] = pd.to_numeric(df["Value"])
-
-    # "+/-ReportedPrice" is not a good name for a column.
-    df = df.rename(columns={"+/-ReportedPrice": "Change in Reported Price"})
-
-    df["Change in Reported Price"] = df["Change in Reported Price"].replace(
+    # Nan corrections
+    df["Reported Price Change (%)"] = df["Reported Price Change (%)"].replace(
         np.nan, "0")
 
-    # Percentage sign isn't required in "Value" column & must be a number.
-    df["Change in Reported Price"] = df["Change in Reported Price"].apply(
+    # Data format & type corrections.
+    df["Value"] = df["Value"].apply(parseValueColumnToNumber)
+    df["Value"] = pd.to_numeric(df["Value"])
+
+    df["Reported Price Change (%)"] = df["Reported Price Change (%)"].apply(
         parseReturnsColumnToNumber)
-    df["Change in Reported Price"] = pd.to_numeric(
-        df["Change in Reported Price"])
+    df["Reported Price Change (%)"] = pd.to_numeric(
+        df["Reported Price Change (%)"])
+
+    # Ticker and name of the stock are inside the same columns, we are going to slit it into 2 different columns
+    df["Ticker"] = df["Stock"].apply(lambda x: x.split(" - ")[0])
+    df["Stock"] = df["Stock"].apply(lambda x: x.split(" - ")[1])
+
+    # We move "Ticker" column to the front
+    col = df.pop("Ticker")
+    df.insert(0, col.name, col)
 
     return [name, period, portfolio_date, df]
 
