@@ -26,7 +26,7 @@ funds_data = []
 for fund_ticker in funds_tickers:
     print("Processing 1: " + fund_ticker)
     fund_data = getData(fund_ticker)
-    funds_data.append([fund_ticker, fund_data])
+    funds_data.append([fund_ticker, fund_data[-1]])
 
     # Fund positions
     df = fund_data[-1]
@@ -45,13 +45,17 @@ for fund_ticker in funds_tickers:
 
 # Matrix of Stocks (columns) and Funds (Rows)
 stocks_funds_matrix = np.zeros((len(funds_tickers), len(stock_set)), float)
+stocks_funds_df = pd.DataFrame(stocks_funds_matrix)
+stocks_funds_df.columns = stock_set
+stocks_funds_df.index = funds_tickers
 
-print('\n'.join([''.join(['{:4}'.format(item) for item in row])
-      for row in stocks_funds_matrix]))
 
-for [fund_ticker, df] in funds_data:
+for fund_ticker, df in funds_data:
     print("Processing 2: " + fund_ticker)
-    # T
+
+    # Queremos coger los pesos en el portfolio de df y apuntarlos en la matriz general
+    df["Portfolio (%)"].apply(
+        lambda x: aux(fund_ticker, stocks_funds_df, x, df))
 
 
 print("All funds processed.")
