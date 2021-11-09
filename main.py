@@ -5,9 +5,9 @@ import numpy as np
 
 
 # List of funds to analyze
-# funds_tickers = ["MKL", "GFT", "psc", "LMM", "oaklx", "ic", "DJCO", "TGM",
-#                "AM", "aq", "oc", "HC", "SAM", "PI", "DA", "BAUPOST", "FS", "GR", "BRK"]
-funds_tickers = ["PI", "SAM"]
+funds_tickers = ["MKL", "GFT", "psc", "LMM", "oaklx", "ic", "DJCO", "TGM",
+                 "AM", "aq", "oc", "HC", "SAM", "PI", "DA", "BAUPOST", "FS", "GR", "BRK"]
+#funds_tickers = ["PI", "SAM", "DJCO"]
 funds_names = []
 funds_period = []
 funds_portfolio_date = []
@@ -49,15 +49,15 @@ stocks_funds_df = pd.DataFrame(stocks_funds_matrix)
 stocks_funds_df.columns = stock_set
 stocks_funds_df.index = funds_tickers
 
-
+# We register stock weights in the matrix
 for fund_ticker, df in funds_data:
     print("Processing 2: " + fund_ticker)
+    stocks_funds_df.at[fund_ticker] = df["Portfolio (%)"]
 
-    # Queremos coger los pesos en el portfolio de df y apuntarlos en la matriz general
-    df["Portfolio (%)"].apply(
-        lambda x: aux(fund_ticker, stocks_funds_df, x, df))
+# Funds without a position will have a NaN in place, we substitute those for 0's
+stocks_funds_df = stocks_funds_df.fillna(0)
 
-
+countOpenPositions(stocks_funds_df)
 print("All funds processed.")
 
 
@@ -72,4 +72,16 @@ funds_df = pd.DataFrame(data={
     "Average Return in Open Positions (%)": funds_average_return_open_pos
 })
 
-""" print(sortByConcentration(funds_df)) """
+# Print Results
+print("\n")
+print("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
+print("\n")
+# Funds info
+print(funds_df)
+print("\n\n\n")
+# Funds / Stock Matrix
+print(stocks_funds_df)
+print("\n\n\n")
+# Number of funds that own each stock
+print(countOpenPositions(stocks_funds_df))
+print("\n\n\n")
