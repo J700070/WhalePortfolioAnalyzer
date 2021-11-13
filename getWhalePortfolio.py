@@ -83,3 +83,24 @@ def parseValueColumnToNumber(string):
 # We delete the dollar sign and the commas
 def parseReturnsColumnToNumber(string):
     return string.replace("%", "")
+
+
+def getDataBuys(holding_ticker):
+    # Data Extraction
+    # We obtain the HTML from the corresponding fund in Dataroma.
+
+    html = requests.get(
+        "https://www.dataroma.com/m/m_activity.php?m="+holding_ticker + "&typ=b", headers={
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:94.0) Gecko/20100101 Firefox/94.0",
+            "Accept": "image/avif,image/webp,*/*",
+            "Accept-Language": "es-ES,es;q=0.8,en-US;q=0.5,en;q=0.3",
+            "Sec-Fetch-Dest": "image",
+            "Sec-Fetch-Mode": "no-cors",
+            "Sec-Fetch-Site": "same-origin",
+            "Cache-Control": "max-age=0"
+        }).content
+
+    df_list = pd.read_html(html)
+    df = df_list[0]
+    print(df.head())
+    return

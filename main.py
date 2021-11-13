@@ -1,9 +1,9 @@
 import pandas as pd
-from getWhalePortfolio import getData
+from getWhalePortfolio import *
 from analyzePortfolio import *
 import numpy as np
 
-
+getDataBuys("MKL")
 # List of funds to analyze
 funds_tickers = ["MKL", "GFT", "psc", "LMM", "oaklx", "ic", "DJCO", "TGM",
                  "AM", "aq", "oc", "HC", "SAM", "PI", "DA", "BAUPOST", "FS", "GR", "BRK"]
@@ -22,9 +22,10 @@ stock_set = set([])
 # Fund data from getWhalePortfolio function
 funds_data = []
 
+print("Processing 1: ")
 # Data extraction
 for fund_ticker in funds_tickers:
-    print("Processing 1: " + fund_ticker)
+    print(fund_ticker)
     fund_data = getData(fund_ticker)
     funds_data.append([fund_ticker, fund_data[-1]])
 
@@ -50,8 +51,9 @@ stocks_funds_df.columns = stock_set
 stocks_funds_df.index = funds_tickers
 
 # We register stock weights in the matrix
+print("Processing 2: ")
 for fund_ticker, df in funds_data:
-    print("Processing 2: " + fund_ticker)
+    print(fund_ticker)
     stocks_funds_df.at[fund_ticker] = df["Portfolio (%)"]
 
 # Funds without a position will have a NaN in place, we substitute those for 0's
@@ -72,16 +74,21 @@ funds_df = pd.DataFrame(data={
     "Average Return in Open Positions (%)": funds_average_return_open_pos
 })
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.max_columns', None)
 # Print Results
-print("\n")
+""" print("\n")
 print("-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------")
 print("\n")
 # Funds info
 print(funds_df)
 print("\n\n\n")
 # Funds / Stock Matrix
-print(stocks_funds_df)
+print(stocks_funds_df.head(20))
 print("\n\n\n")
 # Number of funds that own each stock
-print(countOpenPositions(stocks_funds_df))
+print(countOpenPositions(stocks_funds_df).transpose().head(10))
 print("\n\n\n")
+
+print(biggestOpenPositions(stocks_funds_df).transpose().head(10))
+print("\n\n\n") """
